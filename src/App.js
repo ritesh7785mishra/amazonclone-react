@@ -8,6 +8,7 @@ import Login from "./Login";
 import {getAuth , onAuthStateChanged} from "./firebase"
 import {auth} from "./firebase"
 import {useStateValue} from "./StateProvider"
+import Payment from "./Payment.js"
 
 function App() {
 
@@ -79,6 +80,14 @@ function App() {
             <>
             <Header/>
             <Checkout/>
+            </>
+            }
+          />
+          <Route exact path="/payment"element={
+            <>
+            <Header/>
+            {/* <h1>I am the payment router</h1> */}
+            <Payment/>
             </>
             }
           />
