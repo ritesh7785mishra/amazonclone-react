@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import CheckoutProduct from './CheckoutProduct';
 import "./Payment.css"
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 import { useStateValue } from './StateProvider'
 import {CardElement,useStripe,useElements} from "@stripe/react-stripe-js"
 import CurrencyFormat from "react-currency-format"
 import {getBasketTotal} from "./reducer"
+import axios from "./axios"
 
 function Payment() {
+    const navigate = useNavigate();
     const [{basket, user}, dispatch] = useStateValue();
 
     const stripe = useStripe();
@@ -18,9 +20,47 @@ function Payment() {
 
     const [error, setError] = useState(null);
     const [disabled, setDisabled]= useState(true);
+    const [clientSecret, setClientSecret] = useState(true)
 
-    const handleSubmit = e => {
+    useEffect(() => {
+      // generate the special stripe secret which allows us to charge a customer
+
+      const getClientSecret = async() => {
+        const response = await axios({
+            method: 'post',
+            url:`/payments/create?total=${getBasketTotal(basket)}`
+        })
+        setClientSecret(response.data.clientSecret)
+      }
+        getClientSecret()
+       
+    }, [basket])
+    
+
+    const handleSubmit = async (event) => {
         //do all the fancy stripe stuff
+        event.preventDefault();
+        setProcessing(true);
+
+        const payload = await stripe.confirmCardPayment(clientSecret,{
+            payment_method: {
+                card: elements.getElement(CardElement)
+            }
+        }).then(({ paymentIntent })=>{
+            //paymentIntent = payment confirmation
+
+            setSucceded(true);
+            setError(null)
+            setProcessing(false)
+            
+            // latest v of useHistory
+            navigate("/orders", {replace:true})
+
+
+
+            
+        })
+
     }
     const handleChange = event => {
         // Listen for changes in the CardElement
