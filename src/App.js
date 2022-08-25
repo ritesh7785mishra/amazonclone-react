@@ -9,6 +9,10 @@ import {getAuth , onAuthStateChanged} from "./firebase"
 import {auth} from "./firebase"
 import {useStateValue} from "./StateProvider"
 import Payment from "./Payment.js"
+import {loadStripe} from "@stripe/stripe-js"
+import {Elements} from "@stripe/react-stripe-js"
+
+const promise = loadStripe("pk_test_51LX1ZtSBDyQ5ewdGmItaiUEkHkRkrXlKOaeChSI0HN5wHoxvXUUYlxz9QYNBBkyv3mSdYUZuOPwjlTry6tOwrYgv00rYpDOW5R")
 
 function App() {
 
@@ -87,7 +91,10 @@ function App() {
             <>
             <Header/>
             {/* <h1>I am the payment router</h1> */}
-            <Payment/>
+            <Elements stripe={promise}>
+              <Payment/>
+            </Elements>
+          
             </>
             }
           />
